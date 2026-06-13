@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Deep-link handler so Tachiyomi/Mihon can open pawchive.net URLs
+        directly in the extension (creator pages and individual posts).
+    -->
+    <application>
+        <activity
+            android:name="eu.kanade.tachiyomi.extension.en.pawchive.PawchiveUrlActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoDisplay">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Creator listing pages: pawchive.net/patreon/user/12345 -->
+                <data
+                    android:host="pawchive.net"
+                    android:pathPattern="/.*/.*/.*"
+                    android:scheme="https" />
+
+                <!-- Bare domain root -->
+                <data
+                    android:host="pawchive.net"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

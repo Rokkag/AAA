@@ -1,0 +1,10 @@
+ext {
+    extName        = 'Pawchive'
+    pkgNameSuffix  = 'en.pawchive'
+    extClass       = '.Pawchive'
+    extVersionCode = 1
+    // Pawchive hosts adult creator-archive content
+    containsNsfw   = true
+}
+
+apply from: "$rootDir/common.gradle"
