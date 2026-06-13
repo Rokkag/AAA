@@ -1,10 +1,8 @@
 ext {
-    extName        = 'Pawchive'
-    pkgNameSuffix  = 'en.pawchive'
-    extClass       = '.Pawchive'
+    extName = 'Pawchive'
+    extClass = '.Pawchive'
     extVersionCode = 1
-    // Pawchive hosts adult creator-archive content
-    containsNsfw   = true
+    isNsfw = true
 }
 
-apply from: "$rootDir/common.gradle"
+apply plugin: "kei.plugins.extension.legacy"
