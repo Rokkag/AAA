@@ -17,8 +17,11 @@ jobs:
         with:
           path: pawchive
 
-      - name: Clone mihon extensions-source
-        run: GIT_TERMINAL_PROMPT=0 git clone --depth=1 https://github.com/mihonapp/extensions-source.git extensions-source
+      - name: Download mihon extensions-source
+        run: |
+          curl -L -o ext-source.zip https://github.com/mihonapp/extensions-source/archive/refs/heads/main.zip
+          unzip -q ext-source.zip
+          mv extensions-source-main extensions-source
 
       - name: Inject Pawchive module
         run: rsync -a pawchive/ extensions-source/src/en/pawchive/ --exclude='.github'
