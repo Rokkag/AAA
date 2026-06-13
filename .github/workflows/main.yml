@@ -1,0 +1,60 @@
+name: Build & Publish Pawchive Extension
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Clone mihon extensions-source
+        run: git clone --depth=1 https://github.com/mihonapp/extensions-source.git /tmp/extensions-source
+
+      - name: Inject Pawchive module
+        run: rsync -a --exclude='.github' . /tmp/extensions-source/src/en/pawchive/
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build debug APK
+        working-directory: /tmp/extensions-source
+        run: ./gradlew :src:en:pawchive:assembleDebug --no-daemon
+
+      - name: Collect APK
+        run: |
+          mkdir -p /tmp/repo
+          APK=$(find /tmp/extensions-source/src/en/pawchive/build -name "*.apk" | head -1)
+          cp "$APK" /tmp/repo/tachiyomi-en.pawchive-v1.apk
+
+      - name: Generate index.json
+        run: |
+          SOURCE_ID=$(python3 -c "print(0x5061776368697665)")
+          cat > /tmp/repo/index.json << EOF
+          [{"name":"Pawchive","pkg":"eu.kanade.tachiyomi.extension.en.pawchive","apk":"tachiyomi-en.pawchive-v1.apk","lang":"en","code":1,"version":"1.0.0","nsfw":1,"sources":[{"name":"Pawchive","lang":"en","id":"$SOURCE_ID","baseUrl":"https://pawchive.net","versionId":1}]}]
+          EOF
+
+      - name: Publish to repo branch
+        run: |
+          cd /tmp/repo
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b repo
+          git add .
+          git commit -m "publish build"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push origin repo --force
