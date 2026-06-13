@@ -18,10 +18,11 @@ jobs:
           path: pawchive
           persist-credentials: false
 
-      - name: Clone mihon extensions-source
+      - name: Download keiyoushi extensions-source
         run: |
-          git -c credential.helper= clone --depth=1 \
-            https://github.com/mihonapp/extensions-source.git extensions-source
+          wget -q "https://github.com/keiyoushi/extensions-source/archive/refs/heads/main.zip" -O ext-source.zip
+          unzip -q ext-source.zip
+          mv extensions-source-main extensions-source
 
       - name: Inject Pawchive module
         run: rsync -a pawchive/ extensions-source/src/en/pawchive/ --exclude='.github'
